@@ -51,6 +51,10 @@ begin
         RESET <= '0';
         wait for 25 ns;
         RESET <= '1';
+        wait for 190 ns;
+        RESET <= '0';
+        wait for 10 ns;
+        RESET <= '1';
         wait;
     end process;
     
@@ -64,28 +68,47 @@ begin
 
     DL_t: process
     begin
-        SET <= '0';
         PASSWORD <= 3; wait for 25 ns;
         PASSWORD <= 4; wait for 10 ns;
         PASSWORD <= 3; wait for 10 ns;
         SET <= '1'; wait for 10 ns;
-        SET <= '0'; PASSWORD <= 1; wait for 10 ns;
-        PASSWORD <= 2; wait for 10 ns;
+        PASSWORD <= 5; SET <= '0'; wait for 10 ns;
+        PASSWORD <= 6; wait for 10 ns;
+        PASSWORD <= 7; wait for 10 ns;
+        PASSWORD <= 8; wait for 10 ns;
+        SET <= '1'; wait for 10 ns;
+        PASSWORD <= 5; SET <= '0'; wait for 10 ns;
+        PASSWORD <= 6; wait for 10 ns;
+        PASSWORD <= 7; wait for 10 ns;
+        PASSWORD <= 9; wait for 10 ns;
+        PASSWORD <= 5; wait for 10 ns;
+        PASSWORD <= 6; wait for 10 ns;
+        PASSWORD <= 7; wait for 10 ns;
+        PASSWORD <= 8; wait for 10 ns;
+        
+        PASSWORD <= 9; wait for 10 ns;
+        PASSWORD <= 1; wait for 10 ns;
         PASSWORD <= 3; wait for 10 ns;
         PASSWORD <= 4; wait for 10 ns;
         SET <= '1'; wait for 10 ns;
-        SET <= '0'; PASSWORD <= 3; wait for 10 ns;
-        PASSWORD <= 4; wait for 10 ns;
+        PASSWORD <= 5; SET <= '0'; wait for 10 ns;
+        PASSWORD <= 6; wait for 10 ns;
+        PASSWORD <= 7; wait for 10 ns;
+        PASSWORD <= 9; wait for 10 ns;
+        SET <= '1'; wait for 10 ns;
+        PASSWORD <= 1; SET <= '0'; wait for 10 ns;
+        PASSWORD <= 3; wait for 10 ns;
+        PASSWORD <= 8; wait for 10 ns;
+        PASSWORD <= 9; wait for 10 ns;
+        PASSWORD <= 1; wait for 10 ns;
+        PASSWORD <= 3; wait for 10 ns;
+        PASSWORD <= 3; wait for 10 ns;
+        PASSWORD <= 7; wait for 10 ns;
         PASSWORD <= 1; wait for 10 ns;
         PASSWORD <= 2; wait for 10 ns;
         PASSWORD <= 3; wait for 10 ns;
-        PASSWORD <= 4; wait for 10 ns;
-        PASSWORD <= 3; wait for 10 ns;
-        PASSWORD <= 4; wait for 10 ns;
-        PASSWORD <= 1; wait for 10 ns;
-        PASSWORD <= 2; wait for 10 ns;
-        PASSWORD <= 3; wait for 10 ns;
-        PASSWORD <= 4; wait;
+        PASSWORD <= 6; wait;
+
     end process;
 
 end Behavioral;
