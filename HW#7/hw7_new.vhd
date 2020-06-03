@@ -8,32 +8,21 @@ entity Door_Lock is
         RESET: in std_logic;
         SET: in std_logic;
         PASSWORD: in integer range 1 to 9;
-        LED: out std_logic_vector(4 downto 0);
-        o_state: out integer range 0 to 3;
-        o_cnt: out integer range 0 to 4;
-        o_pw1: out integer;
-        o_pw2: out integer;
-        o_pw3: out integer;
-        o_pw4: out integer;
-        o_t1: out integer;
-        o_t2: out integer;
-        o_t3: out integer;
-        o_t4: out integer
+        LED: out std_logic_vector(4 downto 0)
         );
 end Door_Lock;
 
 architecture Behavioral of Door_Lock is
     type num4 is array (1 to 4) of integer range 0 to 9;
-    signal state: integer range 1 to 6 :=1;
-    signal nstate: integer range 1 to 6;
+    type STATES is (S_setup, S_1st, S_2nd, S_3rd, S_success, S_fail);
+    signal state: STATES := S_setup;
+    signal nstate: STATES := S_setup;
 
 begin
-    o_state <= state;
-
-    state_trans: process(RESET, CLK)
+    state_transition: process(RESET, CLK)
     begin
         if(RESET = '0') then
-            state <= 1;
+            state <= S_setup;
         elsif(CLK = '1' and CLK'event) then
             state <= nstate;
         end if;
@@ -45,13 +34,13 @@ begin
         variable tryPW: num4 := (0,0,0,0);
     begin
         if(RESET = '0') then
-            nstate <= 1;
+            nstate <= S_setup;
             cnt := 0;
             PWMem := (0,0,0,0);
             tryPW := (0,0,0,0);
         elsif(CLK = '1' and CLK'event) then
             case state is
-                when 1 =>
+                when S_setup =>
                     if (set = '1' and cnt < 4 and PWMem(4)=0) then
                         cnt := 0;
                         PWMem := (0,0,0,0);
@@ -60,10 +49,10 @@ begin
                         PWMem(cnt):= PASSWORD;
                         if(cnt = 4 and set = '0') then
                             cnt := 0;
-                            nstate <= 2;
+                            nstate <= S_1st;
                            end if;
                     end if;
-                when 2 =>
+                when S_1st =>
                     if (cnt = 0 and set = '0') then
                         cnt:= 1;
                         tryPW(1) := PASSWORD;
@@ -77,32 +66,32 @@ begin
                         cnt := 1;
                         tryPW(4) := PASSWORD;
                         if(tryPW = PWMem) then
-                            nstate <= 5;
+                            nstate <= S_success;
                         else
-                            nstate <= 3;
+                            nstate <= S_2nd;
                         end if;
                     end if;
-                when 3 =>
+                when S_2nd =>
                     if (cnt = 4) then
                         tryPW(4) := PASSWORD;
                         cnt := 1;
                         if(tryPW = PWMem) then
-                            nstate <= 5;
+                            nstate <= S_success;
                         else
-                            nstate <= 4;
+                            nstate <= S_3rd;
                         end if;
                     else
                         tryPW(cnt) := PASSWORD;
                         cnt := cnt + 1;
                     end if;
-                when 4 =>
+                when S_3rd =>
                     if (cnt = 4) then
                         tryPW(4) := PASSWORD;
                         cnt := 1;
                         if(tryPW = PWMem) then
-                            nstate <= 5;
+                            nstate <= S_success;
                         else
-                            nstate <= 6;
+                            nstate <= S_fail;
                         end if;
                     else
                         tryPW(cnt) := PASSWORD;
@@ -111,35 +100,25 @@ begin
                 when others => NULL;
             end case;
         end if;
-        o_cnt <= cnt;
-        o_pw1 <= pwMem(1);
-        o_pw2 <= pwMem(2);
-        o_pw3 <= pwMem(3);
-        o_pw4 <= pwMem(4);  
-        o_t1 <= tryPW(1);
-        o_t2 <= tryPW(2);
-        o_t3 <= tryPW(3);
-        o_t4 <= tryPW(4);        
     end process;
 
     ledout: process(state)
     begin
         case state is
-            when 1 =>
+            when S_setup =>
                 LED <= "00000";
-            when 2 =>
+            when S_1st =>
                 LED <= "01000";
-            when 3 =>
+            when S_2nd =>
                 LED <= "01001";
-            when 4 =>
+            when S_3rd =>
                 LED <= "01011";
-            when 5 =>
+            when S_success =>
                 LED <= "01111";
-            when 6 =>
+            when S_fail =>
                 LED <= "11000";
             when others => NULL;
         end case;
     end process;
 
-    
 end Behavioral;
