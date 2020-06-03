@@ -62,11 +62,15 @@ begin
     CntDoneLogic: process(RESET, CLK)
         variable cnt: integer range 0 to 4 := 0;
         variable pwMemory: num4 := (0,0,0,0);
+        variable tryPW: num4 := (0,0,0,0);
     begin
         done <= '0';
         if(RESET = '0') then
             done <= '0';
             tryCnt <= 0;
+            cnt := 0;
+            pwMemory := (0,0,0,0);
+            tryPW := (0,0,0,0);
         elsif(CLK = '1' and CLK'event) then
             case state is
                 when S_setup =>
@@ -81,15 +85,23 @@ begin
                         pwMemory(cnt) := PASSWORD;
                     end if;
                 when S_trial =>
-                    
-                when S_done =>
-
+                    if (cnt = 3) then
+                        if (not(pwMemory(1)=tryPW(1) and pwMemory(2) = tryPW(2)
+                        and pwMemory(3)=tryPW(3) and pwMemory(4)=PASSWORD)) then
+                            if (tryCnt = 2) then done <= '1'; end if;
+                            tryCnt <= tryCnt + 1;
+                            cnt := 1;
+                            tryPW := (0,0,0,0);
+                        else done <= '1';
+                        end if;
+                    else
+                        cnt := cnt+1;
+                        tryPW(cnt) := PASSWORD;
+                    end if;
+                when S_done => NULL;
                 when others => NULL;
             end case;
-        end if;
-        
+        end if;        
     end process;
-
-
     
 end Behavioral;
