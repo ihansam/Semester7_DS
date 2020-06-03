@@ -82,9 +82,7 @@ begin
                         end if;
                     end if;
                 when 3 =>
-                    if (cnt = 0 and set = '1') then
-                        cnt:= 1;
-                    elsif (cnt = 4) then
+                    if (cnt = 4) then
                         tryPW(4) := PASSWORD;
                         cnt := 1;
                         if(tryPW = PWMem) then
@@ -97,9 +95,7 @@ begin
                         cnt := cnt + 1;
                     end if;
                 when 4 =>
-                    if (cnt = 0 and set = '1') then
-                        cnt:= 1;
-                    elsif (cnt = 4) then
+                    if (cnt = 4) then
                         tryPW(4) := PASSWORD;
                         cnt := 1;
                         if(tryPW = PWMem) then
