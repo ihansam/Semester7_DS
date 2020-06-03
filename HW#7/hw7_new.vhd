@@ -45,6 +45,7 @@ begin
         variable tryPW: num4 := (0,0,0,0);
     begin
         if(RESET = '0') then
+            nstate <= 1;
             cnt := 0;
             PWMem := (0,0,0,0);
             tryPW := (0,0,0,0);
