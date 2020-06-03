@@ -16,7 +16,11 @@ entity Door_Lock is
         o_pw1: out integer;
         o_pw2: out integer;
         o_pw3: out integer;
-        o_pw4: out integer
+        o_pw4: out integer;
+        o_t1: out integer;
+        o_t2: out integer;
+        o_t3: out integer;
+        o_t4: out integer
         );
 end Door_Lock;
 
@@ -100,18 +104,24 @@ begin
                         pwMemory(cnt) := PASSWORD;
                     end if;
                 when 1 =>
-                    if (cnt = 3) then
+                    if (cnt = 0 and set = '0') then
+                        cnt := 1;
+                        tryPW(1) := PASSWORD;
+                    elsif (cnt = 1) then
+                        cnt := 2;
+                        tryPW(2) := PASSWORD;
+                    elsif (cnt = 2) then
+                        cnt := 3;
+                        tryPW(3) := PASSWORD;
+                    elsif (cnt = 3) then
+                        cnt := 0;
+                        tryPW(4) := PASSWORD;
                         if (not(pwMemory(1)=tryPW(1) and pwMemory(2) = tryPW(2)
-                        and pwMemory(3)=tryPW(3) and pwMemory(4)=PASSWORD)) then
+                        and pwMemory(3)=tryPW(3) and pwMemory(4)=tryPW(4))) then
                             if (tryCnt = 2) then done <= '1'; end if;
                             tryCnt <= tryCnt + 1;
-                            cnt := 0;
-                            tryPW := (0,0,0,0);
                         else done <= '1';
                         end if;
-                    else
-                        cnt := cnt+1;
-                        tryPW(cnt) := PASSWORD;
                     end if;
                 when 2 => NULL;
                 when others => NULL;
@@ -121,7 +131,11 @@ begin
         o_pw1 <= pwMemory(1);
         o_pw2 <= pwMemory(2);
         o_pw3 <= pwMemory(3);
-        o_pw4 <= pwMemory(4);        
+        o_pw4 <= pwMemory(4);  
+        o_t1 <= tryPW(1);
+        o_t2 <= tryPW(2);
+        o_t3 <= tryPW(3);
+        o_t4 <= tryPW(4);        
     end process;
     
 end Behavioral;

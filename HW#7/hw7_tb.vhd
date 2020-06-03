@@ -18,7 +18,11 @@ architecture Behavioral of Door_Lock_TB is
             o_pw1: out integer;
             o_pw2: out integer;
             o_pw3: out integer;
-            o_pw4: out integer);
+            o_pw4: out integer;
+        o_t1: out integer;
+        o_t2: out integer;
+        o_t3: out integer;
+        o_t4: out integer            );
             
     end component;                                  
 
@@ -35,11 +39,16 @@ architecture Behavioral of Door_Lock_TB is
     signal o_pw2: integer;
     signal o_pw3: integer;
     signal o_pw4: integer;
+    signal o_t1: integer;
+       signal o_t2: integer;
+       signal o_t3: integer;
+       signal o_t4: integer;
 begin
     DL: Door_Lock port map (CLK => CLK, RESET => RESET,
         SET => SET, PASSWORD => PASSWORD, LED => LED,
         o_state => o_state, o_tryCnt => o_tryCnt, o_done => o_done, o_cnt => o_cnt,
-        o_pw1 => o_pw1, o_pw2 => o_pw2, o_pw3 => o_pw3, o_pw4 => o_pw4);
+        o_pw1 => o_pw1, o_pw2 => o_pw2, o_pw3 => o_pw3, o_pw4 => o_pw4,
+        o_t1 => o_t1, o_t2 => o_t2, o_t3 => o_t3, o_t4 => o_t4);
 
     rst_t: process
     begin
