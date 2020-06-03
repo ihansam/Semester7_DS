@@ -8,41 +8,51 @@ entity Door_Lock is
         RESET: in std_logic;
         SET: in std_logic;
         PASSWORD: in integer range 1 to 9;
-        LED: out std_logic_vector(4 downto 0));
+        LED: out std_logic_vector(4 downto 0);
+        o_state: out integer range 0 to 3;
+        o_tryCnt: out integer range 0 to 3;
+        o_done: out std_logic;
+        o_cnt: out integer range 0 to 4
+        );
 end Door_Lock;
 
 architecture Behavioral of Door_Lock is
     type num4 is array (1 to 4) of integer range 0 to 9;
-    type STATES is (S_setup, S_trial, S_done);
+    -- type STATES is (S_setup, S_trial, S_done);
     -- setting password, try unlock, unlock or locked
-    signal state: STATES := S_setup;
+    -- signal state: STATES := S_setup;
+    signal state: integer range 0 to 2;
     signal tryCnt: integer range 0 to 3 := 0;
-    signal done: std_logic := 0;
+    signal done: std_logic := '0';
 
 begin
+    o_state <= state;
+    o_tryCnt <= tryCnt;
+    o_done <= done;
+
     fsm: process(RESET, CLK)
     begin
         if(RESET = '0') then
-            state <= S_setup;
+            state <= 0;
         elsif(CLK = '1' and CLK'event) then
             case state is
-                when S_setup =>
-                    if (done = '1') then state <= S_trial; end if;
-                when S_trial =>
-                    if (doen = '1') then state <= S_done; end if;
-                when S_done =>
-                    state <= S_done;
+                when 0 =>
+                    if (done = '1') then state <= 1; end if;
+                when 1 =>
+                    if (done = '1') then state <= 2; end if;
+                when 2 =>
+                    state <= 2;
                 when others => NULL;
             end case;
         end if;
     end process;
 
-    led: process(state)
+    ledout: process(state, tryCnt)
     begin
         case state is
-            when S_setup =>
+            when 0 =>
                 LED <= "00000";
-            when S_trial =>
+            when 1 =>
                 if (tryCnt = 0) then
                     LED <= "01000";
                 elsif (tryCnt = 1) then
@@ -50,7 +60,7 @@ begin
                 elsif (tryCnt = 2) then
                     LED <= "01011";
                 end if;
-            when S_done =>
+            when 2 =>
                 if (tryCnt <= 2) then
                     LED <= "01111";     -- success to unlock
                 else LED <= "11000";    -- unlock forever
@@ -64,7 +74,6 @@ begin
         variable pwMemory: num4 := (0,0,0,0);
         variable tryPW: num4 := (0,0,0,0);
     begin
-        done <= '0';
         if(RESET = '0') then
             done <= '0';
             tryCnt <= 0;
@@ -72,8 +81,9 @@ begin
             pwMemory := (0,0,0,0);
             tryPW := (0,0,0,0);
         elsif(CLK = '1' and CLK'event) then
+            done <= '0';
             case state is
-                when S_setup =>
+                when 0 =>
                     if (set = '1' and cnt /= 4) then
                         cnt := 0;
                         pwMemory := (0,0,0,0);
@@ -84,7 +94,7 @@ begin
                         cnt := cnt + 1;
                         pwMemory(cnt) := PASSWORD;
                     end if;
-                when S_trial =>
+                when 1 =>
                     if (cnt = 3) then
                         if (not(pwMemory(1)=tryPW(1) and pwMemory(2) = tryPW(2)
                         and pwMemory(3)=tryPW(3) and pwMemory(4)=PASSWORD)) then
@@ -98,10 +108,11 @@ begin
                         cnt := cnt+1;
                         tryPW(cnt) := PASSWORD;
                     end if;
-                when S_done => NULL;
+                when 2 => NULL;
                 when others => NULL;
             end case;
-        end if;        
+        end if;
+    o_cnt <= cnt;        
     end process;
     
 end Behavioral;
