@@ -12,7 +12,11 @@ entity Door_Lock is
         o_state: out integer range 0 to 3;
         o_tryCnt: out integer range 0 to 3;
         o_done: out std_logic;
-        o_cnt: out integer range 0 to 4
+        o_cnt: out integer range 0 to 4;
+        o_pw1: out integer;
+        o_pw2: out integer;
+        o_pw3: out integer;
+        o_pw4: out integer
         );
 end Door_Lock;
 
@@ -37,7 +41,7 @@ begin
         elsif(CLK = '1' and CLK'event) then
             case state is
                 when 0 =>
-                    if (done = '1') then state <= 1; end if;
+                    if (done = '1' and set= '1') then state <= 1; end if;
                 when 1 =>
                     if (done = '1') then state <= 2; end if;
                 when 2 =>
@@ -84,13 +88,14 @@ begin
             done <= '0';
             case state is
                 when 0 =>
-                    if (set = '1' and cnt /= 4) then
+                    if (set = '1' and pwMemory(4) = 0) then
                         cnt := 0;
                         pwMemory := (0,0,0,0);
-                    elsif (set = '1' and cnt = 4) then
-                        cnt := 0;
+                    elsif (cnt = 3 and set = '0') then
                         done <= '1';
-                    else
+                        pwMemory(4) := PASSWORD;
+                        cnt := 0;
+                    elsif (pwMemory(4) = 0) then
                         cnt := cnt + 1;
                         pwMemory(cnt) := PASSWORD;
                     end if;
@@ -100,7 +105,7 @@ begin
                         and pwMemory(3)=tryPW(3) and pwMemory(4)=PASSWORD)) then
                             if (tryCnt = 2) then done <= '1'; end if;
                             tryCnt <= tryCnt + 1;
-                            cnt := 1;
+                            cnt := 0;
                             tryPW := (0,0,0,0);
                         else done <= '1';
                         end if;
@@ -112,7 +117,11 @@ begin
                 when others => NULL;
             end case;
         end if;
-    o_cnt <= cnt;        
+        o_cnt <= cnt;
+        o_pw1 <= pwMemory(1);
+        o_pw2 <= pwMemory(2);
+        o_pw3 <= pwMemory(3);
+        o_pw4 <= pwMemory(4);        
     end process;
     
 end Behavioral;

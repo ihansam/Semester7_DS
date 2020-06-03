@@ -14,7 +14,11 @@ architecture Behavioral of Door_Lock_TB is
             o_state: out integer range 0 to 3;
             o_tryCnt: out integer range 0 to 3;
             o_done: out std_logic;
-            o_cnt: out integer range 0 to 4);
+            o_cnt: out integer range 0 to 4;
+            o_pw1: out integer;
+            o_pw2: out integer;
+            o_pw3: out integer;
+            o_pw4: out integer);
             
     end component;                                  
 
@@ -27,11 +31,15 @@ architecture Behavioral of Door_Lock_TB is
     signal o_tryCnt: integer range 0 to 3;
     signal o_done: std_logic;
     signal o_cnt: integer range 0 to 4;
-
+    signal o_pw1: integer;
+    signal o_pw2: integer;
+    signal o_pw3: integer;
+    signal o_pw4: integer;
 begin
     DL: Door_Lock port map (CLK => CLK, RESET => RESET,
         SET => SET, PASSWORD => PASSWORD, LED => LED,
-        o_state => o_state, o_tryCnt => o_tryCnt, o_done => o_done, o_cnt => o_cnt);
+        o_state => o_state, o_tryCnt => o_tryCnt, o_done => o_done, o_cnt => o_cnt,
+        o_pw1 => o_pw1, o_pw2 => o_pw2, o_pw3 => o_pw3, o_pw4 => o_pw4);
 
     rst_t: process
     begin
